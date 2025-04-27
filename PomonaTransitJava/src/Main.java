@@ -51,6 +51,7 @@ public class Main {
             rs.close();
             ps.close();
             conn.close();
+            scanner.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
