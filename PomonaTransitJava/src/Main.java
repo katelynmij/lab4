@@ -90,7 +90,8 @@ public class Main {
                     case 6:
                         // adding a bus
                         System.out.println("Enter BusID: ");
-                        String BusID = scanner.nextLine();
+                        int BusID = scanner.nextInt();
+                        scanner.nextLine();
 
                         System.out.println("Enter the bus model: ");
                         String model = scanner.nextLine();
@@ -104,12 +105,45 @@ public class Main {
                     case 7:
                         //deleting a bus
                         System.out.println("Enter BusID: ");
-                        String busID = scanner.nextLine();
+                        int busID = scanner.nextInt();
+                        scanner.nextLine();
 
                         deleteBus(conn, busID);
                         break;
                     case 8:
-                        //inserting actual trip information will add later
+                        //inserting actual trip information
+                        System.out.println("Enter tripNumber: ");
+                        int tripNumber = scanner.nextInt();
+                        scanner.nextLine();
+
+                        System.out.println("Enter date of the trip (YYYY-MM-DD): ");
+                        Date date = Date.valueOf(scanner.nextLine());   
+
+                        System.out.println("Enter a scheduled start time (HH:MM:SS): ");
+                        Time scheduledStartTime = Time.valueOf(scanner.nextLine()); 
+
+                        System.out.println("Enter a stop number: ");
+                        int stopNumber = scanner.nextInt();
+                        scanner.nextLine();
+
+                        System.out.println("Enter a scheduled arrival time (HH:MM:SS): ");
+                        Time scheduledArrivalTime = Time.valueOf(scanner.nextLine());
+
+                        System.out.println("Enter a actual start time (HH:MM:SS): ");
+                        Time actualStartTime = Time.valueOf(scanner.nextLine());
+
+                        System.out.println("Enter a actual arrival time (HH:MM:SS): ");
+                        Time actualArrivalTime = Time.valueOf(scanner.nextLine());
+
+                        System.out.println("Enter amount of passengers in: ");
+                        int passengersIn = scanner.nextInt();
+                        scanner.nextLine();
+
+                        System.out.println("Enter amount of passengers out: ");
+                        int passengersOut = scanner.nextInt();
+                        scanner.nextLine();
+
+                        recordActualTripStopInfo(conn, tripNumber, date, scheduledStartTime, stopNumber, scheduledArrivalTime, actualStartTime, actualArrivalTime, passengersIn, passengersOut);
                         break;
                     case 9:
                         System.out.println("Exiting");
@@ -145,10 +179,10 @@ public class Main {
         }
     }
 
-    static void addBus(Connection conn, String busID, String model, int year) throws SQLException {
+    static void addBus(Connection conn, int busID, String model, int year) throws SQLException {
         String sql = "INSERT INTO Bus (BusID, Model, Year) VALUES (?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, busID);
+            stmt.setInt(1, busID);
             stmt.setString(2, model);
             stmt.setInt(3, year);
             int rows = stmt.executeUpdate();
@@ -164,10 +198,10 @@ public class Main {
         }
     }
 
-    static void deleteBus(Connection conn, String busID) throws SQLException {
+    static void deleteBus(Connection conn, int busID) throws SQLException {
         String sql = "DELETE FROM Bus WHERE BusID = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, busID);
+            stmt.setInt(1, busID);
             int affectedRow = stmt.executeUpdate();
             System.out.println("Deleted " + affectedRow + " row from the Bus table");
         }
@@ -194,6 +228,12 @@ public class Main {
         stmt.setInt(8, passengersIn);
         stmt.setInt(9, passengersOut);
         stmt.executeUpdate();
+        } catch (SQLException e) {
+            if (e.getMessage().contains("REFERENCE constraint")) {
+                System.out.println("Foreign key constraint violation: " + e.getMessage());
+            } else {
+                throw e;
+            }
+        }
     }
-}
 }
