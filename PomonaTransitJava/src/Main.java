@@ -55,4 +55,74 @@ public class Main {
             e.printStackTrace();
         }
     }
+
+    static void addDriver(Connection conn, String name, String phone) throws SQLException {
+        String sql = "INSERT INTO Driver (DriverName, DriverTelephoneNumber) VALUES (?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, name);
+            stmt.setString(2, phone);
+            int rows = stmt.executeUpdate();
+            if (rows > 0) {
+                System.out.println("Driver " + name + " was successfully added.");
+            } else {
+                System.out.println("No driver was added.");
+            }
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println("Could not add driver: A driver with the name " + name + " already exists.");
+        } catch (Exception e) {
+            System.out.println("Error adding a driver, check inputs.");
+        }
+    }
+
+    static void addBus(Connection conn, String busID, String model, int year) throws SQLException {
+        String sql = "INSERT INTO Bus (BusID, Model, Year) VALUES (?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, busID);
+            stmt.setString(2, model);
+            stmt.setInt(3, year);
+            int rows = stmt.executeUpdate();
+            if (rows > 0) {
+                System.out.println("Bus " + busID + " was successfully added.");
+            } else {
+                System.out.println("No bus was added.");
+            }
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println("Could not add bus: A bus with the busID " + busID + " already exists.");
+        } catch (Exception e) {
+            System.out.println("Error adding a bus, check inputs.");
+        }
+    }
+
+    static void deleteBus(Connection conn, String busID) throws SQLException {
+        String sql = "DELETE FROM Bus WHERE BusID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, busID);
+            int affectedRow = stmt.executeUpdate();
+            System.out.println("Deleted " + affectedRow + " row from the Bus table");
+        }
+    }
+
+    static void recordActualTripStopInfo(
+    Connection conn, int tripNumber, Date date, Time scheduledStartTime,
+    int stopNumber, Time scheduledArrivalTime, Time actualStartTime, Time actualArrivalTime,
+    int passengersIn, int passengersOut) throws SQLException {
+
+    String sql = "INSERT INTO ActualTripStopInfo " +
+        "(TripNumber, Date, ScheduledStartTime, StopNumber, SecheduledArrivalTime, " +
+        "ActualStartTime, ActualArrivalTime, NumberOfPassengerIn, NumberOfPassengerOut) " +
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, tripNumber);
+        stmt.setDate(2, date);
+        stmt.setTime(3, scheduledStartTime);
+        stmt.setInt(4, stopNumber);
+        stmt.setTime(5, scheduledArrivalTime);
+        stmt.setTime(6, actualStartTime);
+        stmt.setTime(7, actualArrivalTime);
+        stmt.setInt(8, passengersIn);
+        stmt.setInt(9, passengersOut);
+        stmt.executeUpdate();
+    }
+}
 }
