@@ -40,57 +40,115 @@ public class Main {
                         System.out.print("What is the date? (yyyy-mm-dd): ");
                         String dateInput = scanner.nextLine();
     
-                        PreparedStatement ps = conn.prepareStatement(
+                        PreparedStatement ps1 = conn.prepareStatement(
                             "SELECT t.TripNumber, o.Date, o.ScheduledStartTime, o.ScheduledArrivalTime, " +
                             "o.DriverName, o.BusID " +
                             "FROM Trip t JOIN TripOffering o ON t.TripNumber = o.TripNumber " +
                             "WHERE t.StartLocationName = ? AND t.DestinationName = ? AND o.Date = ?"
                         );
     
-                        ps.setString(1, start);
-                        ps.setString(2, dest);
-                        ps.setDate(3, java.sql.Date.valueOf(dateInput));
+                        ps1.setString(1, start);
+                        ps1.setString(2, dest);
+                        ps1.setDate(3, java.sql.Date.valueOf(dateInput));
     
-                        ResultSet rs = ps.executeQuery();
+                        ResultSet rs1 = ps1.executeQuery();
     
                         System.out.println("\n-- Trip Schedule --");
-                        while (rs.next()) {
-                            System.out.println("Trip #: " + rs.getInt("TripNumber"));
-                            System.out.println("Date: " + rs.getDate("Date"));
-                            System.out.println("Start Time: " + rs.getTime("ScheduledStartTime"));
-                            System.out.println("Arrival Time: " + rs.getTime("ScheduledArrivalTime"));
-                            System.out.println("Driver: " + rs.getString("DriverName"));
-                            System.out.println("Bus ID: " + rs.getString("BusID"));
+                        while (rs1.next()) {
+                            System.out.println("Trip #: " + rs1.getInt("TripNumber"));
+                            System.out.println("Date: " + rs1.getDate("Date"));
+                            System.out.println("Start Time: " + rs1.getTime("ScheduledStartTime"));
+                            System.out.println("Arrival Time: " + rs1.getTime("ScheduledArrivalTime"));
+                            System.out.println("Driver: " + rs1.getString("DriverName"));
+                            System.out.println("Bus ID: " + rs1.getString("BusID"));
                             System.out.println("-----");
                             }
 
-                        rs.close();
-                        ps.close();
+                        rs1.close();
+                        ps1.close();
                         break;
                         
                     case 2:
                         // WIP
+                        System.out.println("Choose an option: ");
+                        System.out.println("1.Delete a Trip Offering.");
+                        System.out.println("2.Add a Trip Offering.");
+                        System.out.println("3:Change the Driver for a Trip Offering.");
+                        System.out.println("4:Change the Bus for a Trip Offering.");
+                        System.out.print("Enter a number: ");
+                        int choice = scanner.nextInt();
+                        scanner.nextLine();
+
+                        //preparing parameters
+                        Integer tripNumber = null;
+                        String date = null;
+                        String startTime = null;
+                        String arrivalTime = null;
+                        String driverName = null;
+                        String busID = null;
+
+                        if (choice == 1 || choice == 3 || choice == 4) {
+                            System.out.print("Enter the Trip Number: ");
+                            tripNumber = scanner.nextInt();
+                            scanner.nextLine();
+                            System.out.print("Enter the Date (YYYY-MM-DD): ");
+                            date = scanner.nextLine();
+                            System.out.print("Enter the Scheduled Start Time (HH:MM:SS): ");
+                            startTime = scanner.nextLine();
+                        }
+                        if (choice == 2) {
+                            System.out.print("Enter the Trip Number: ");
+                            tripNumber = scanner.nextInt();
+                            scanner.nextLine();
+                            System.out.print("Enter the Date (YYYY-MM-DD): ");
+                            date = scanner.nextLine();
+                            System.out.print("Enter the Scheduled Start Time (HH:MM:SS): ");
+                            startTime = scanner.nextLine();
+                            System.out.print("Enter the Scheduled Arrival Time (HH:MM:SS): ");
+                            arrivalTime = scanner.nextLine();
+                            System.out.print("Enter the Driver's Name: ");
+                            driverName = scanner.nextLine();
+                            System.out.print("Enter the Bus ID: ");
+                            busID = scanner.nextLine();
+                        }
+                        if (choice == 3) {
+                            System.out.print("Enter the New Driver's Name: ");
+                            driverName = scanner.nextLine();
+                        }
+                        if (choice == 4) {
+                            System.out.print("Enter the New Bus ID: ");
+                            busID = scanner.nextLine();
+                        }
+                        editTripOffering(conn, choice, tripNumber, date, startTime, arrivalTime, driverName, busID);
                         break;
                     case 3:
                         // WIP
+                        System.out.print("Enter the trip number: ");
+                        int tripNumForStops = scanner.nextInt();
+                        displayTripStops(conn, tripNumForStops);
                         break;
                     case 4:
                         // WIP
+                        System.out.print("Enter the driver's name: ");
+                        String driverForWeeklySchedule = scanner.nextLine();
+                        System.out.print("Etner the date (YYYY-MM-DD): ");
+                        String weeklyDateInput = scanner.nextLine();
+                        displayWeeklySchedule(conn, driverForWeeklySchedule, weeklyDateInput);
                         break;
                     case 5:
                         // kenneth testing adding a driver
                         System.out.println("What is the Driver's name: ");
-                        String name = scanner.nextLine();
+                        String newDriverName = scanner.nextLine();
 
                         System.out.println("What is the Driver's phone number: (xxx-xxx-xxxx)");
                         String phone = scanner.nextLine();
 
-                        addDriver(conn, name, phone);
+                        addDriver(conn, newDriverName, phone);
                         break;
                     case 6:
                         // adding a bus
                         System.out.println("Enter BusID: ");
-                        int BusID = scanner.nextInt();
+                        int newBusID = scanner.nextInt();
                         scanner.nextLine();
 
                         System.out.println("Enter the bus model: ");
@@ -100,40 +158,40 @@ public class Main {
                         int year = scanner.nextInt();
                         scanner.nextLine();
 
-                        addBus(conn, BusID, model, year);
+                        addBus(conn, newBusID, model, year);
                         break;
                     case 7:
                         //deleting a bus
                         System.out.println("Enter BusID: ");
-                        int busID = scanner.nextInt();
+                        int busIDToDelete = scanner.nextInt();
                         scanner.nextLine();
 
-                        deleteBus(conn, busID);
+                        deleteBus(conn, busIDToDelete);
                         break;
                     case 8:
                         //inserting actual trip information
                         System.out.println("Enter tripNumber: ");
-                        int tripNumber = scanner.nextInt();
+                        int tripNumberInput = scanner.nextInt();
                         scanner.nextLine();
 
                         System.out.println("Enter date of the trip (YYYY-MM-DD): ");
-                        Date date = Date.valueOf(scanner.nextLine());   
+                        Date tripDate = Date.valueOf(scanner.nextLine());   
 
                         System.out.println("Enter a scheduled start time (HH:MM:SS): ");
-                        Time scheduledStartTime = Time.valueOf(scanner.nextLine()); 
+                        Time scheduledStart = Time.valueOf(scanner.nextLine()); 
 
                         System.out.println("Enter a stop number: ");
                         int stopNumber = scanner.nextInt();
                         scanner.nextLine();
 
                         System.out.println("Enter a scheduled arrival time (HH:MM:SS): ");
-                        Time scheduledArrivalTime = Time.valueOf(scanner.nextLine());
+                        Time scheduledArrival= Time.valueOf(scanner.nextLine());
 
                         System.out.println("Enter a actual start time (HH:MM:SS): ");
-                        Time actualStartTime = Time.valueOf(scanner.nextLine());
+                        Time actualStart = Time.valueOf(scanner.nextLine());
 
                         System.out.println("Enter a actual arrival time (HH:MM:SS): ");
-                        Time actualArrivalTime = Time.valueOf(scanner.nextLine());
+                        Time actualArrival = Time.valueOf(scanner.nextLine());
 
                         System.out.println("Enter amount of passengers in: ");
                         int passengersIn = scanner.nextInt();
@@ -143,7 +201,7 @@ public class Main {
                         int passengersOut = scanner.nextInt();
                         scanner.nextLine();
 
-                        recordActualTripStopInfo(conn, tripNumber, date, scheduledStartTime, stopNumber, scheduledArrivalTime, actualStartTime, actualArrivalTime, passengersIn, passengersOut);
+                        recordActualTripStopInfo(conn, tripNumberInput, tripDate, scheduledStart, stopNumber, scheduledArrival, actualStart, actualArrival, passengersIn, passengersOut);
                         break;
                     case 9:
                         System.out.println("Exiting");
