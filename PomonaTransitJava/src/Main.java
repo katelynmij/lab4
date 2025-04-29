@@ -96,7 +96,7 @@ public class Main {
                         System.out.println("Enter the bus model: ");
                         String model = scanner.nextLine();
 
-                        System.out.println("Enter the bus: ");
+                        System.out.println("Enter the bus year: ");
                         int year = scanner.nextInt();
                         scanner.nextLine();
 
@@ -213,7 +213,7 @@ public class Main {
     int passengersIn, int passengersOut) throws SQLException {
 
     String sql = "INSERT INTO ActualTripStopInfo " +
-        "(TripNumber, Date, ScheduledStartTime, StopNumber, SecheduledArrivalTime, " +
+        "(TripNumber, Date, ScheduledStartTime, StopNumber, ScheduledArrivalTime, " +
         "ActualStartTime, ActualArrivalTime, NumberOfPassengerIn, NumberOfPassengerOut) " +
         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     
